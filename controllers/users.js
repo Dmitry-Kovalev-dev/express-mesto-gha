@@ -3,22 +3,22 @@ const User = require('../models/user');
 
 const getUsers = (req, res) => {
   User.find({})
-    .then(users => {
-      return res.status(200).send({ data: users });
+    .then((users) => {
+      res.status(200).send({ data: users });
     })
     .catch(() => {
-      return res.status(500).send({ message: 'Ошибка сервера' });
+      res.status(500).send({ message: 'Ошибка сервера' });
     });
 };
 
 const getUserById = (req, res) => {
   User.findById(req.params.id).orFail(new Error('NotFound'))
-    .then(user => {
-      return res.status(200).send({ data: user });
+    .then((user) => {
+      res.status(200).send({ data: user });
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' })
+        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       if (err instanceof mongoose.Error.CastError) {
         return res.status(400).send({ message: 'Некорректный _id' });
@@ -30,10 +30,10 @@ const getUserById = (req, res) => {
 const postUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then(user => {
-      return res.status(201).send({ data: user });
+    .then((user) => {
+      res.status(201).send({ data: user });
     })
-    .catch(err => {
+    .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
       }
@@ -46,12 +46,12 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true, upsert: false }
+    { new: true, runValidators: true, upsert: false },
   ).orFail(new Error('NotFound'))
-    .then(user => {
-      return res.status(200).send({ data: user });
+    .then((user) => {
+      res.status(200).send({ data: user });
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
@@ -67,12 +67,12 @@ const updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true, upsert: false }
+    { new: true, runValidators: true, upsert: false },
   ).orFail(new Error('NotFound'))
-    .then(user => {
+    .then((user) => {
       res.status(200).send({ avatar: user.avatar });
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
@@ -88,5 +88,5 @@ module.exports = {
   getUserById,
   postUser,
   updateUser,
-  updateUserAvatar
+  updateUserAvatar,
 };
