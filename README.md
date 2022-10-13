@@ -1,6 +1,7 @@
 [![Tests](https://github.com/Dmitry-Kovalev-dev/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/Dmitry-Kovalev-dev/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/Dmitry-Kovalev-dev/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/Dmitry-Kovalev-dev/express-mesto-gha/actions/workflows/tests-14-sprint.yml)
 # Проект Mesto фронтенд + бэкенд
 
+[Ссылка на репозиторий](https://github.com/Dmitry-Kovalev-dev/express-mesto-gha)
 
 
 ## Настройка бейджей статуса тестов
