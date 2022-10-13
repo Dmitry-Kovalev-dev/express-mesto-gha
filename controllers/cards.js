@@ -30,11 +30,14 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(new Error('NotFound'))
     .then(() => {
-      res.status(200).send('Пост удален!');
+      res.status(200).send({card: 'Пост удален!'});
     })
     .catch(err => {
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(400).send({ message: 'Некорректный _id' });
       }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });
@@ -53,6 +56,9 @@ const setLikeCard = (req, res) => {
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(400).send({ message: 'Некорректный _id' });
+      }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });
 };
@@ -62,13 +68,16 @@ const deleteLikeCard = (req, res) => {
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  )
+  ).orFail(new Error('NotFound'))
     .then(card => {
       res.status(200).send(card.likes)
     })
     .catch(err => {
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+      }
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(400).send({ message: 'Некорректный _id' });
       }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });

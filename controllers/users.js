@@ -70,7 +70,7 @@ const updateUserAvatar = (req, res) => {
     { new: true, runValidators: true, upsert: false }
   ).orFail(new Error('NotFound'))
     .then(user => {
-      res.status(200).send(user.avatar);
+      res.status(200).send({ avatar: user.avatar });
     })
     .catch(err => {
       if (err.message === 'NotFound') {
