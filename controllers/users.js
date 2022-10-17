@@ -41,7 +41,7 @@ const postUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(NOT_FOUND).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        return res.status(INCORRECT_INPUT).send({ message: 'Переданы некорректные данные при создании пользователя' });
       }
       return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
