@@ -1,29 +1,35 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const {
+  NOT_FOUND,
+  SERV_ERROR,
+  INCORRECT_INPUT,
+  CREATED,
+} = require('../utils/utils');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.status(200).send({ data: users });
+      res.send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера' });
+      res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
 };
 
 const getUserById = (req, res) => {
   User.findById(req.params.id).orFail(new Error('NotFound'))
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.send({ data: user });
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(400).send({ message: 'Некорректный _id' });
+        return res.status(INCORRECT_INPUT).send({ message: 'Некорректный _id' });
       }
-      return res.status(500).send({ message: 'Ошибка сервера' });
+      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
 };
 
@@ -31,13 +37,13 @@ const postUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(201).send({ data: user });
+      res.status(CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
+        return res.status(NOT_FOUND).send({ message: 'Переданы некорректные данные при создании пользователя' });
       }
-      return res.status(500).send({ message: 'Ошибка сервера' });
+      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
 };
 
@@ -49,16 +55,16 @@ const updateUser = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   ).orFail(new Error('NotFound'))
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.send({ data: user });
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
+        return res.status(INCORRECT_INPUT).send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
-      return res.status(500).send({ message: 'Ошибка сервера' });
+      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
 };
 
@@ -70,16 +76,16 @@ const updateUserAvatar = (req, res) => {
     { new: true, runValidators: true, upsert: false },
   ).orFail(new Error('NotFound'))
     .then((user) => {
-      res.status(200).send({ avatar: user.avatar });
+      res.send({ avatar: user.avatar });
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+        return res.status(NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+        return res.status(INCORRECT_INPUT).send({ message: 'Переданы некорректные данные при обновлении аватара' });
       }
-      return res.status(500).send({ message: 'Ошибка сервера' });
+      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
     });
 };
 
