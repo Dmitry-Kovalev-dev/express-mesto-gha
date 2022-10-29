@@ -1,91 +1,96 @@
 const mongoose = require('mongoose');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 const Card = require('../models/card');
-const {
-  NOT_FOUND,
-  SERV_ERROR,
-  INCORRECT_INPUT,
-  CREATED,
-} = require('../utils/utils');
+const { CREATED, errMessages } = require('../utils/utils');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
       res.send({ cards });
     })
-    .catch(() => {
-      res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
-const postCard = (req, res) => {
+const postCard = (req, res, next) => {
   const { name, link } = req.body;
   const { _id } = req.user;
   Card.create({ name, link, owner: _id })
     .then((card) => {
       res.status(CREATED).send({ data: card });
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(INCORRECT_INPUT).send({ message: 'Переданы некорректные данные при создании карточки' });
+        return next(new BadRequestError(errMessages.createCardBadReq));
       }
-      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
+      next(err);
     });
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('NotFound'))
-    .then(() => {
-      res.send({ card: 'Пост удален!' });
+const deleteCard = (req, res, next) => {
+  const { _id } = req.user;
+  const { id } = req.params;
+  Card.findById(id)
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError(errMessages.cardIdNotFound);
+      }
+      if (_id !== card.owner.toString()) {
+        throw new ForbiddenError(errMessages.unavailable);
+      }
+      Card.findByIdAndRemove(id)
+        .then(() => res.send({ message: 'Пост удален!' }));
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(INCORRECT_INPUT).send({ message: 'Некорректный _id' });
+        return next(new BadRequestError(errMessages.idIncorrect));
       }
-      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
+      next(err);
     });
 };
 
-const setLikeCard = (req, res) => {
+const setLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(new Error('NotFound'))
+  )
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError(errMessages.cardIdNotFound);
+      }
       res.send(card.likes);
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
-      }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(INCORRECT_INPUT).send({ message: 'Некорректный _id' });
+        return next(new BadRequestError(errMessages.idIncorrect));
       }
-      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
+      next(err);
     });
 };
 
-const deleteLikeCard = (req, res) => {
+const deleteLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
-    req.params.cardId,
+    req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true },
-  ).orFail(new Error('NotFound'))
+  )
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError(errMessages.cardIdNotFound);
+      }
       res.send(card.likes);
     })
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
-      }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(INCORRECT_INPUT).send({ message: 'Некорректный _id' });
+        return next(new BadRequestError(errMessages.idIncorrect));
       }
-      return res.status(SERV_ERROR).send({ message: 'Ошибка сервера' });
+      next(err);
     });
 };
 
