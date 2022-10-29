@@ -52,14 +52,19 @@ const getMyData = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { email, password } = req.body;
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       email,
       password: hash,
+      name,
+      about,
+      avatar,
     }))
     .then((userData) => {
-      res.status(CREATED).send({ userId: userData._id });
+      res.status(CREATED).send({ data: userData });
     })
     // eslint-disable-next-line consistent-return
     .catch((err) => {
