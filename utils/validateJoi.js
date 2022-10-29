@@ -12,8 +12,8 @@ const validateRegister = celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(80),
-    about: Joi.string().min(2).max(200),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(REGEX_URL),
   }),
 });
@@ -26,8 +26,8 @@ const validateParamId = celebrate({
 
 const validateUpdateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(80),
-    about: Joi.string().min(2).max(200),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
   }),
 });
 

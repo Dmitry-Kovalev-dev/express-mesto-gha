@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
   },
 }, {
   versionKey: false,
+  toObject: { useProjection: true },
+  toJSON: { useProjection: true },
 });
 
 module.exports = mongoose.model('user', userSchema);

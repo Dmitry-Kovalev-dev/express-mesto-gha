@@ -53,15 +53,15 @@ const getMyData = (req, res, next) => {
 
 const createUser = (req, res, next) => {
   const {
-    email, password, name, about, avatar,
+    email, name, about, avatar,
   } = req.body;
-  bcrypt.hash(password, 10)
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       email,
-      password: hash,
       name,
       about,
       avatar,
+      password: hash,
     }))
     .then((userData) => {
       res.status(CREATED).send({ data: userData });
