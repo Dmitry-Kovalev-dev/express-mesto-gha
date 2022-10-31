@@ -41,7 +41,8 @@ const deleteCard = (req, res, next) => {
         throw new ForbiddenError(errMessages.unavailable);
       }
       Card.findByIdAndRemove(id)
-        .then(() => res.send({ message: 'Пост удален!' }));
+        .then(() => res.send({ message: 'Пост удален!' }))
+        .catch(next);
     })
     // eslint-disable-next-line consistent-return
     .catch((err) => {

@@ -20,7 +20,7 @@ const validateRegister = celebrate({
 
 const validateParamId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24),
+    id: Joi.string().hex().length(24),
   }),
 });
 
