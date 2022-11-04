@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const errorHandler = require('./middleware/errorHandler');
 const router = require('./routes');
+const { requestLogger, errorLogger } = require('./middleware/logger');
 
 // eslint-disable-next-line no-undef
 const { PORT = 3000 } = process.env;
@@ -24,8 +25,8 @@ app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(requestLogger);
 app.use(router);
-
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
