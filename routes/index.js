@@ -5,7 +5,14 @@ const { validateLogin, validateRegister } = require('../utils/validateJoi');
 const { login, createUser } = require('../controllers/users');
 const { auth } = require('../middleware/auth');
 const NotFoundError = require('../errors/NotFoundError');
+const cors = require('../middleware/cors');
 
+router.use(cors);
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 router.post('/signin', validateLogin, login);
 router.post('/signup', validateRegister, createUser);
 

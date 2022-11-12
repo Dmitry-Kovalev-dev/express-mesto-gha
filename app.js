@@ -7,8 +7,8 @@ const { errors } = require('celebrate');
 const errorHandler = require('./middleware/errorHandler');
 const router = require('./routes');
 const { requestLogger, errorLogger } = require('./middleware/logger');
+require('dotenv').config();
 
-// eslint-disable-next-line no-undef
 const { PORT = 3000 } = process.env;
 const app = express();
 

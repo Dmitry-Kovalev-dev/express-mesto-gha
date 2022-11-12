@@ -9,6 +9,11 @@ const {
   errMessages,
 } = require('../utils/utils');
 
+const {
+  NODE_ENV,
+  JWT_SECRET,
+} = process.env;
+
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
@@ -134,7 +139,7 @@ const login = (req, res, next) => {
           if (!matched) {
             throw new UnauthorizedError(errMessages.unauthorized);
           }
-          const token = jwt.sign({ _id: userData._id }, SECRET_KEY, { expiresIn: '7d' });
+          const token = jwt.sign({ _id: userData._id }, NODE_ENV === 'production' ? JWT_SECRET : SECRET_KEY, { expiresIn: '7d' });
           res.cookie('token', token, {
             maxAge: 3600000 * 24 * 7,
             httpOnly: true,
